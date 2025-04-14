@@ -1,21 +1,12 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html lang="ru">
+{% block title %}Главная страница{% endblock %}
 
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Моя первая страница</title>
-
-</head>
-
-<body>
-
-<h1>Привет, Django!</h1>
-
-</body>
-
-</html>
+{% block content %}
+    <div class="text-center">
+        <h2>Добро пожаловать в систему записи к доктору!</h2>
+        <p>Здесь вы можете записаться на прием к врачу, управлять своим профилем и многое другое.</p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg mt-3">Зарегистрироваться</a>
+        <a href="{% url 'login' %}" class="btn btn-secondary btn-lg mt-3">Войти</a>
+    </div>
+{% endblock %}
