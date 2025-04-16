@@ -34,9 +34,14 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Регистрация</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Выйти</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Профиль</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'doctor_apply' %}">Стать доктором</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Выйти</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Регистрация</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>

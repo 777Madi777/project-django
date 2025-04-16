@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Доктора{% endblock %}
+
+{% block content %}
+    <h2 class="text-center mb-4">Список докторов</h2>
+    <div class="list-group">
+        {% for doctor in doctors %}
+            <a href="{% url 'book_appointment' doctor.id %}" class="list-group-item list-group-item-action">
+                <h5 class="mb-1">{{ doctor.first_name }} {{ doctor.last_name }}</h5>
+                <p class="mb-1">{{ doctor.specialty }}</p>
+                <small>Доступные дни: {{ doctor.available_days }}</small>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

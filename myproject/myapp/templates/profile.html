@@ -1,14 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}Редактирование профиля{% endblock %}
+{% block title %}Профиль{% endblock %}
 
 {% block content %}
-    <h2 class="text-center mb-4">Редактирование профиля</h2>
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            {{ form.as_p }}
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Сохранить изменения</button>
-    </form>
+    <h2 class="text-center mb-4">Профиль пользователя</h2>
+
+    <div class="mb-3">
+        <p><strong>Имя:</strong> {{ user.first_name }}</p>
+        <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Роль:</strong> 
+            {% if user.is_doctor %}
+                Доктор
+            {% else %}
+                Пациент
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
+
+        {% if not user.is_doctor %}
+            <a href="{% url 'doctor_apply' %}" class="btn btn-success">Подать заявку на доктора</a>
+        {% endif %}
+        
+        <a href="{% url 'doctor_list' %}" class="btn btn-primary">Записаться к доктору</a>
+
+    </div>
 {% endblock %}

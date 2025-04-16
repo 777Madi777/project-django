@@ -72,6 +72,8 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 AUTH_USER_MODEL = 'myapp.User'
 
+LOGIN_REDIRECT_URL = 'profile'  
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
