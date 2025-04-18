@@ -1,11 +1,19 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<h2>Подача заявки на статус доктора</h2>
+{% block title %}Подача заявки на статус доктора{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Подать заявку</button>
-</form>
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Подача заявки на статус доктора</h2>
+
+    <form method="post" class="row g-3 justify-content-center">
+        {% csrf_token %}
+        <div class="col-md-6">
+            {{ form.as_p }}
+        </div>
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary mt-3">Подать заявку</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

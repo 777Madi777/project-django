@@ -14,9 +14,19 @@ class CustomUserCreationForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'gender', 'date_of_birth']
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),  
+        }
+        labels = {
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+            'email': 'Email',
+            'gender': 'Пол',
+            'date_of_birth': 'Дата рождения',
+        }
 
 class DoctorApplicationForm(forms.Form):
     specialty = forms.CharField(max_length=100)
-    available_days = forms.CharField(max_length=100)  
+    
 

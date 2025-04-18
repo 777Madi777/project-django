@@ -53,15 +53,9 @@ def doctor_apply(request):
     if request.method == 'POST':
         form = DoctorApplicationForm(request.POST)
         if form.is_valid():
-            user = request.user
-            user.is_doctor = True 
-            user.is_patient = False
-            user.save()
-
             Doctor.objects.create(
-                user=user,
-                specialty=form.cleaned_data['specialty'],
-                available_days=form.cleaned_data['available_days']
+                user=request.user,
+                specialty=form.cleaned_data['specialty']
             )
             return redirect('profile') 
     else:
@@ -75,10 +69,13 @@ def doctor_list(request):
     doctors = User.objects.filter(is_doctor=True)
     return render(request, 'doctor_list.html', {'doctors': doctors})
 
-# Запись на прием
+from django.utils.timezone import is_naive, make_aware
+
 @login_required
 def book_appointment(request, doctor_id):
-    doctor = get_object_or_404(User, id=doctor_id, is_doctor=True)
+    doctor_user = get_object_or_404(User, id=doctor_id, is_doctor=True)
+    doctor = get_object_or_404(Doctor, user=doctor_user)
+    
     today = date.today()
     next_week = today + timedelta(days=7)
 
@@ -86,24 +83,57 @@ def book_appointment(request, doctor_id):
     all_slots = generate_time_slots(today, next_week)
     
     # Проверка занятых слотов
-    booked_slots = Appointment.objects.filter(doctor=doctor, date__range=(today, next_week)).values_list('date', flat=True)
+    booked_slots = Appointment.objects.filter(
+        doctor=doctor, 
+        date__range=(today, next_week)
+    ).values_list('date', flat=True)
+
     available_slots = [slot for slot in all_slots if slot not in booked_slots]
 
     if request.method == 'POST':
         selected_slot = request.POST.get('slot')
         if selected_slot:
-            # Преобразуем строку в datetime
-            slot_dt = timezone.make_aware(datetime.fromisoformat(selected_slot))
-            
-            # Создаем запись о записи на прием
+            dt = datetime.fromisoformat(selected_slot)
+            if is_naive(dt):
+                dt = make_aware(dt)
             Appointment.objects.create(
                 doctor=doctor,
                 patient=request.user,
-                date=slot_dt
+                date=dt
             )
             return redirect('profile')
 
     return render(request, 'book_appointment.html', {
         'doctor': doctor,
         'available_slots': available_slots
+    })
+
+
+
+login_required
+def profile(request):
+    user = request.user
+    # Получаем все записи текущего пользователя как пациента
+    user_appointments = Appointment.objects.filter(patient=user).order_by('date')
+
+    # Если пользователь - доктор, получаем записи на сегодня для его пациентов
+    doctor_appointments_today = []
+    if user.is_doctor:
+        doctor_appointments_today = Appointment.objects.filter(
+            doctor__user=user,
+            date__date=timezone.now().date()
+        ).select_related('patient').order_by('date')
+    
+    # Если доктор записан как пациент, также показываем эту запись
+    doctor_appointments = None
+    if user.is_doctor:
+        doctor_appointments = Appointment.objects.filter(
+            doctor__user=user,
+            patient=user
+        ).order_by('date')
+
+    return render(request, 'profile.html', {
+        'user_appointments': user_appointments,
+        'doctor_appointments_today': doctor_appointments_today,
+        'doctor_appointments': doctor_appointments,
     })

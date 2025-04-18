@@ -3,29 +3,74 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
+<div class="container">
     <h2 class="text-center mb-4">Профиль пользователя</h2>
 
-    <div class="mb-3">
-        <p><strong>Имя:</strong> {{ user.first_name }}</p>
-        <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Роль:</strong> 
-            {% if user.is_doctor %}
-                Доктор
-            {% else %}
-                Пациент
-            {% endif %}
-        </p>
+    {% if not user.is_doctor and doctor %}
+        <div class="alert alert-info">
+            Ваша заявка на получение статуса доктора рассматривается администратором.
+        </div>
+    {% endif %}
+
+    <!-- Личная информация -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Личная информация</h5>
+            <p><strong>Имя:</strong> {{ user.first_name }}</p>
+            <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Роль:</strong> 
+                {% if user.is_doctor %}
+                    Доктор
+                {% else %}
+                    Пациент
+                {% endif %}
+            </p>
+            <p><strong>Пол:</strong> {% if user.gender %}{{ user.get_gender_display }}{% else %}Не указан{% endif %}</p>
+            <p><strong>Дата рождения:</strong> {% if user.date_of_birth %}{{ user.date_of_birth|date:"d.m.Y" }}{% else %}Не указана{% endif %}</p>
+        </div>
     </div>
 
-    <div class="d-flex gap-2">
+    <!-- Пациенты, записавшиеся к доктору (если это доктор) -->
+    {% if user.is_doctor and doctor_appointments_today %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Пациенты на сегодня</h5>
+            <ul class="list-group">
+                {% for appt in doctor_appointments_today %}
+                    <li class="list-group-item">
+                        Пациент: {{ appt.patient.get_full_name }} — {{ appt.date|date:"H:i" }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Записи пациента к докторам -->
+    {% if user_appointments %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Ваши записи к докторам</h5>
+            <ul class="list-group">
+                {% for appt in user_appointments %}
+                    <li class="list-group-item">
+                        Доктор: {{ appt.doctor.user.get_full_name }} — {{ appt.date|date:"d.m.Y H:i" }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex gap-2 justify-content-center">
         <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
 
-        {% if not user.is_doctor %}
+        {% if not user.is_doctor and not doctor %}
             <a href="{% url 'doctor_apply' %}" class="btn btn-success">Подать заявку на доктора</a>
         {% endif %}
         
         <a href="{% url 'doctor_list' %}" class="btn btn-primary">Записаться к доктору</a>
-
     </div>
+</div>
 {% endblock %}
