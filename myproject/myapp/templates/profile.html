@@ -11,8 +11,7 @@
             Ваша заявка на получение статуса доктора рассматривается администратором.
         </div>
     {% endif %}
-
-    <!-- Личная информация -->
+    
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Личная информация</h5>
@@ -31,7 +30,6 @@
         </div>
     </div>
 
-    <!-- Пациенты, записавшиеся к доктору (если это доктор) -->
     {% if user.is_doctor and doctor_appointments_today %}
     <div class="card mb-4">
         <div class="card-body">
@@ -47,7 +45,6 @@
     </div>
     {% endif %}
 
-    <!-- Записи пациента к докторам -->
     {% if user_appointments %}
     <div class="card mb-4">
         <div class="card-body">

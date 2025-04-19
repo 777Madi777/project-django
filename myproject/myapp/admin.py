@@ -30,11 +30,6 @@ class AppointmentAdmin(admin.ModelAdmin):
     def time(self, obj):
         return obj.time  
 
-    # Если is_confirmed не добавлено в модель, убираем из list_display и list_filter
-    # Если оно добавлено в модель, вот так его можно использовать:
-    # def is_confirmed(self, obj):
-    #    return obj.is_confirmed
-
 admin.site.register(Appointment, AppointmentAdmin)
 
 

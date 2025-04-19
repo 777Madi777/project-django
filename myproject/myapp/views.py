@@ -7,11 +7,10 @@ from .forms import CustomUserCreationForm, ProfileForm, DoctorApplicationForm
 from .utils import generate_time_slots
 from django.contrib.auth import login
 
-# Главная страница
+
 def home(request):
     return render(request, 'home.html')
 
-# Регистрация пользователя
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -23,7 +22,6 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
-# Профиль пользователя
 @login_required
 def profile(request):
     doctor = Doctor.objects.filter(user=request.user).first()
@@ -32,7 +30,6 @@ def profile(request):
         'doctor': doctor
     })
 
-# Редактирование профиля пользователя
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
@@ -44,7 +41,6 @@ def edit_profile(request):
         form = ProfileForm(instance=request.user)
     return render(request, 'edit_profile.html', {'form': form})
 
-# Подача заявки на статус доктора
 @login_required
 def doctor_apply(request):
     if request.user.is_doctor:
@@ -63,7 +59,6 @@ def doctor_apply(request):
 
     return render(request, 'doctor_apply.html', {'form': form})
 
-# Список докторов
 @login_required
 def doctor_list(request):
     doctors = User.objects.filter(is_doctor=True)
@@ -79,10 +74,8 @@ def book_appointment(request, doctor_id):
     today = date.today()
     next_week = today + timedelta(days=7)
 
-    # Генерация всех возможных временных слотов на неделю
     all_slots = generate_time_slots(today, next_week)
-    
-    # Проверка занятых слотов
+
     booked_slots = Appointment.objects.filter(
         doctor=doctor, 
         date__range=(today, next_week)
@@ -113,18 +106,15 @@ def book_appointment(request, doctor_id):
 login_required
 def profile(request):
     user = request.user
-    # Получаем все записи текущего пользователя как пациента
     user_appointments = Appointment.objects.filter(patient=user).order_by('date')
 
-    # Если пользователь - доктор, получаем записи на сегодня для его пациентов
     doctor_appointments_today = []
     if user.is_doctor:
         doctor_appointments_today = Appointment.objects.filter(
             doctor__user=user,
             date__date=timezone.now().date()
         ).select_related('patient').order_by('date')
-    
-    # Если доктор записан как пациент, также показываем эту запись
+
     doctor_appointments = None
     if user.is_doctor:
         doctor_appointments = Appointment.objects.filter(
