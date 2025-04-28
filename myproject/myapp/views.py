@@ -101,29 +101,19 @@ def book_appointment(request, doctor_id):
         'available_slots': available_slots
     })
 
-
-
-login_required
+@login_required
 def profile(request):
     user = request.user
-    user_appointments = Appointment.objects.filter(patient=user).order_by('date')
+    today = timezone.now().date()
+
+    user_appointments = Appointment.objects.filter(patient=user,date__gte=today).order_by('date')
 
     doctor_appointments_today = []
     if user.is_doctor:
-        doctor_appointments_today = Appointment.objects.filter(
-            doctor__user=user,
-            date__date=timezone.now().date()
+        doctor_appointments_today = Appointment.objects.filter(doctor__user=user,date__date=today
         ).select_related('patient').order_by('date')
-
-    doctor_appointments = None
-    if user.is_doctor:
-        doctor_appointments = Appointment.objects.filter(
-            doctor__user=user,
-            patient=user
-        ).order_by('date')
 
     return render(request, 'profile.html', {
         'user_appointments': user_appointments,
         'doctor_appointments_today': doctor_appointments_today,
-        'doctor_appointments': doctor_appointments,
     })
