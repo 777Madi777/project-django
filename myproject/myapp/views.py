@@ -43,16 +43,19 @@ def edit_profile(request):
 
 @login_required
 def doctor_apply(request):
-    if request.user.is_doctor:
-        return redirect('profile')  
+    user = request.user
+
+    if user.is_doctor:
+        return redirect('profile')
 
     if request.method == 'POST':
         form = DoctorApplicationForm(request.POST)
         if form.is_valid():
-            Doctor.objects.create(
-                user=request.user,
-                specialty=form.cleaned_data['specialty']
-            )
+            if not hasattr(user, 'doctor'):
+                Doctor.objects.create(
+                    user=user,
+                    specialty=form.cleaned_data['specialty']
+                )
             return redirect('profile') 
     else:
         form = DoctorApplicationForm()

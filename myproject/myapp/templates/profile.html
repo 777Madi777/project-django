@@ -1,17 +1,16 @@
 {% extends 'base.html' %}
-
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Профиль пользователя</h2>
 
-    {% if not user.is_doctor and doctor %}
+    {% if not user.is_doctor and user.doctor %}
         <div class="alert alert-info">
             Ваша заявка на получение статуса доктора рассматривается администратором.
         </div>
     {% endif %}
-    
+
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Личная информация</h5>
@@ -63,11 +62,13 @@
     <div class="d-flex gap-2 justify-content-center">
         <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
 
-        {% if not user.is_doctor and not doctor %}
+        {% if not user.is_doctor and not user.doctor %}
             <a href="{% url 'doctor_apply' %}" class="btn btn-success">Подать заявку на доктора</a>
         {% endif %}
         
-        <a href="{% url 'doctor_list' %}" class="btn btn-primary">Записаться к доктору</a>
+        {% if not user.is_doctor %}
+            <a href="{% url 'doctor_list' %}" class="btn btn-primary">Записаться к доктору</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
